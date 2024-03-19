@@ -4,6 +4,7 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import servlet.service.ServletService;
@@ -21,5 +22,10 @@ public class ServletController {
 		model.addAttribute("resultStr", str);
 		
 		return "main/main";
+	}
+
+	@RequestMapping(value = "/test.do")
+	public String test() {
+		return "main/test";
 	}
 }
