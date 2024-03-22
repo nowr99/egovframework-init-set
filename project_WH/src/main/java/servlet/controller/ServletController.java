@@ -15,11 +15,7 @@ public class ServletController {
 	private ServletService servletService;
 	
 	@RequestMapping(value = "/main.do")
-	public String mainTest(ModelMap model) throws Exception {
-		System.out.println("sevController.java - mainTest()");
-		
-		String str = servletService.addStringTest("START! ");
-		model.addAttribute("resultStr", str);
+	public String main() throws Exception {
 		
 		return "main/main";
 	}
