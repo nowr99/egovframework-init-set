@@ -1,12 +1,20 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page import="org.springframework.core.io.support.PropertiesLoaderUtils" %>
+<%@ page import="java.util.Properties" %>
+
+<%
+   // 프로퍼티 파일에서 API 키를 읽어옴
+   Properties properties = PropertiesLoaderUtils.loadAllProperties("property/globals.properties");
+   String apiKey = properties.getProperty("Globals.apiKey");
+%>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>지도지도</title>
 
-<script type="text/javascript" src="https://map.vworld.kr/js/vworldMapInit.js.do?apiKey=F3FE0D54-D4E4-31CE-8F63-D78D91404A35"></script>
+<script type="text/javascript" src="https://map.vworld.kr/js/vworldMapInit.js.do?apiKey=<%= apiKey %>"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
 <script>
 </script>
@@ -19,6 +27,8 @@
 </head>
 <body>
 <script type="text/javascript">
+
+
   var map = null;  
   var draggableMarker;
   var testMarker;
@@ -142,6 +152,55 @@
      alert("지도 시작이벤트");
   }
   
+//.ajax 시도 선택하면 시군구 띄우기
+$(document).ready(function(){
+	$('#sido').change(function(){
+		  var selectSido = $(this).val();
+		  console.log(selectSido);
+			  $.ajax({
+				url: '/selectSido.do',
+				type: 'post',
+				data: {"sido": selectSido},
+				dataType: 'json',
+				success: function(response) {
+					var selectSgg = $("#sgg");
+					selectSgg.html("<option>-시/군/구-</option>");
+					for (var i = 0; i < response.length; i++) {
+						var item = response[i];
+						selectSgg.append ("<option>" + item.sgg_nm + "</option>");
+					}
+				},
+				error : function(xhr, status, error){
+					alert(xhr + "---" + error + 'ajax 오류' + selectSido + "," + selectSgg);
+				}
+			  }); // 시,군,구 ajax end
+	});
+});
+
+//.ajax 시군구 선택하면 법정동 띄우기
+$(document).ready(function(){
+	$('#sgg').change(function(){
+		  var selectSgg = $(this).val();
+		  console.log(selectSgg);
+			  $.ajax({
+				url: '/selectSgg.do',
+				type: 'post',
+				data: {"sgg": selectSgg},
+				dataType: 'json',
+				success: function(response) {
+					var selectBjd = $("#bjd");
+					selectBjd.html("<option>-법정동-</option>");
+					for (var i = 0; i < response.length; i++) {
+						var item = response[i];
+						selectBjd.append ("<option>" + item.bjd_nm + "</option>");
+					}
+				},
+				error : function(xhr, status, error){
+					alert(xhr + "---" + error + 'ajax 오류' + selectSgg + "," + selectBjd);
+				}
+			  }); // 법정동 ajax end
+	});
+});
 </script>
 
 <!-- 지도가 들어갈 영역 시작 -->
@@ -170,8 +229,23 @@
       <button type="button" onclick="javascript:removeWMS2('geoserver2');"
          name="removewms2">SD 삭제</button>
    </div>
-
-
+	
+	<div>
+	<select id="sido">
+		<option>-시/도-</option>
+		<c:forEach items="${list}" var="sd" >
+		<option value="${sd.sd_cd}">${sd.sd_nm }</option>
+		</c:forEach>
+	</select>
+	
+	<select id="sgg">
+		<option>-시/군/구-</option>
+	</select>
+	
+	<select id="bjd">
+		<option>-법정동-</option>
+	</select>
+	</div>
 </body>
 
 </html>
