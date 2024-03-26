@@ -15,10 +15,6 @@ public class ServletDAO extends EgovComAbstractDAO {
 	@Autowired
 	private SqlSessionTemplate session;
 	
-	public List<EgovMap> selectAll() {
-		return selectList("servlet.serVletTest");
-	}
-
 	public List<ServletDTO> sidoList() {
 		return selectList("servlet.sidoList");
 	}

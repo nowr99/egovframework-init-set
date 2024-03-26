@@ -38,5 +38,4 @@ public class RestFullController {
 			return list2;
 		}
 		
-
 }

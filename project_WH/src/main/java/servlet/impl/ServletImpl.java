@@ -17,11 +17,6 @@ public class ServletImpl extends EgovAbstractServiceImpl implements ServletServi
 	@Resource(name="ServletDAO")
 	private ServletDAO dao;
 	
-	@Override
-	public String addStringTest(String str) throws Exception {
-		List<EgovMap> mediaType = dao.selectAll();
-		return str + " -> testImpl ";
-	}
 
 	@Override
 	public List<ServletDTO> sidoList() {

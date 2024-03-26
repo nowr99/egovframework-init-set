@@ -2,7 +2,23 @@ package servlet.dto;
 
 
 public class ServletDTO {
-	private String sd_nm, sd_cd, sgg_nm, sgg_cd, bjd_nm, bjd_cd;
+	private String sd_nm, sd_cd, sgg_nm, sgg_cd, bjd_nm, bjd_cd, sd_lon, sd_lat;
+
+	public String getSd_lon() {
+		return sd_lon;
+	}
+
+	public void setSd_lon(String sd_lon) {
+		this.sd_lon = sd_lon;
+	}
+
+	public String getSd_lat() {
+		return sd_lat;
+	}
+
+	public void setSd_lat(String sd_lat) {
+		this.sd_lat = sd_lat;
+	}
 
 	public String getSd_nm() {
 		return sd_nm;

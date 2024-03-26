@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="servlet">
-
-	<select id="serVletTest" resultType="egovMap">
-		<![CDATA[
-			SELECT 
-				FILENAME, FILEREALNAME
-			FROM
-				UPLOAD
-			WHERE
-				1=1
-		]]>
-	</select>
+	
+	<select id="serVletTest" resultType="EgovMap">
+	      <![CDATA[
+	         SELECT 
+	            FILENAME, FILEREALNAME
+	         FROM
+	            UPLOAD
+	         WHERE
+	            1=1
+	      ]]>
+   	</select>
 	
 	<select id="sidoList" resultType="servletDTO">
-		SELECT distinct sd_cd, sd_nm FROM tl_sd ORDER BY sd_nm ASC
+		SELECT distinct sd_cd, sd_nm, ST_X(ST_TRANSFORM(ST_Centroid(geom), 4326)) AS sd_lon,
+    	ST_Y(ST_TRANSFORM(ST_Centroid(geom), 4326)) AS sd_lat FROM tl_sd ORDER BY sd_nm ASC
 	</select>
 	
 	<select id="sggList" resultType="servletDTO" parameterType="String">
-		SELECT distinct b.sgg_cd, b.sgg_nm FROM tl_sd a JOIN tl_sgg b ON a.sd_nm = b.sd_nm WHERE a.sd_cd = #{sido} ORDER BY b.sgg_nm ASC
+		SELECT distinct b.sgg_cd, b.sgg_nm FROM tl_sd a JOIN tl_sgg b ON a.sd_nm = b.sd_nm WHERE a.sd_cd = #{sido} AND b.geom IS NOT NULL ORDER BY b.sgg_nm ASC
 	</select>
 	
 	<select id="bjdList" resultType="servletDTO" parameterType="String">
