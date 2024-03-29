@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="uploadFile">
+    <insert id="uploadFile" parameterType="Map">
+        INSERT INTO "TB_CARBON_B1" VALUES (#{year_month}, #{site_lo}, #{road_site_lo}, #{sgg_cd}, #{bjd_cd}, #{site_div_cd}, #{bun}, #{ji}, #{new_addr_no}, #{new_addr_road_cd}, #{new_addr_under_cd}, #{new_addr_main_no}, #{new_addr_sub_no}, #{used_khw})
+    </insert>
+    
+    <delete id="deleteTable">
+    	DELETE FROM "TB_CARBON_B1"
+    </delete>
+</mapper>

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import egovframework.rte.fdl.cmmn.EgovAbstractServiceImpl;
 import egovframework.rte.psl.dataaccess.util.EgovMap;
+import servlet.dao.ServletDAO;
 import servlet.dto.ServletDTO;
 import servlet.service.ServletService;
 

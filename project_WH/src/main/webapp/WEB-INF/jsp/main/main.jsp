@@ -15,6 +15,12 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <meta charset="UTF-8">
 <title>지도지도</title>
+
+ <!-- Leaflet CSS 파일 -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <!-- Leaflet JavaScript 파일 -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
 <script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v6.15.1/build/ol.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
 <style>
@@ -66,10 +72,10 @@ $( document ).ready(function() {
         	}
 	        
         	var cql_filter = "sd_cd = " + selectSido;
-	        console.log(selectSido);
-	        console.log(cql_filter);
+	       // console.log(selectSido);
+	       // console.log(cql_filter);
 	        var mapView = map.getView().calculateExtent();
-	 	   console.log(mapView);
+	 	  // console.log(mapView);
 	        
 	 	  
 	 
@@ -100,7 +106,6 @@ $( document ).ready(function() {
 	   			serverType : 'geoserver',
 	   		})
 	   		});
-	   		console.log(sdLayer);
 	   		map.addLayer(sdLayer);
 	   	
 	   		
@@ -112,10 +117,12 @@ $( document ).ready(function() {
 	            dataType: 'json',
 	            success: function(response) {
 	                var selectSgg = $("#sgg");
+	                var selectBjdRe = $("#bjd");
 	                selectSgg.html("<option>-시/군/구-</option>");
+	                selectBjdRe.html("<option>-범례선택-</option>");
 	                for (var i = 0; i < response.length; i++) {
 	                    var item = response[i];
-	                    selectSgg.append("<option value='" + item.sgg_cd + "'>" + item.sgg_nm + "</option>");
+	                    selectSgg.append("<option value='" + item.sgg_cd +"' data-lon = '"+ item.sgg_lon + "' data-lat = '" + item.sgg_lat + "'>" + item.sgg_nm + "</option>");
 	                }
 	            },
 	            error : function(xhr, status, error){
@@ -131,13 +138,18 @@ $( document ).ready(function() {
 	   $('#sgg').change(function(){
 			  var selectSgg = $(this).val();
 			  var cql_filter1 = "sgg_cd = " + selectSgg;
+			  var sggLon = $(this).find('option:selected').data('lon');
+		      var sggLat = $(this).find('option:selected').data('lat');
+			 
+		      map.getView().setCenter(ol.proj.fromLonLat([sggLon, sggLat]));
+		      map.getView().setZoom(12);
+			  
 			  console.log(selectSgg);
 			  console.log(cql_filter1);
 				  
 			   if (sggLayer) {
-			        	
 			        map.removeLayer(sggLayer);	
-			        
+			        map.removeLayer(bjdLayer);	
 			        }  
 			  
 			  // 시군구 레이어
@@ -171,10 +183,10 @@ $( document ).ready(function() {
 					dataType: 'json',
 					success: function(response) {
 						var selectBjd = $("#bjd");
-						selectBjd.html("<option>-법정동-</option>");
+						selectBjd.html("<option>-범례선택-</option>");
 						for (var i = 0; i < response.length; i++) {
 							var item = response[i];
-							selectBjd.append ("<option>" + item.bjd_nm + "</option>");
+							selectBjd.append ("<option value='"+item.bjd_cd+"'>" + item.bjd_nm + "</option>");
 						}
 					},
 					error : function(xhr, status, error){
@@ -183,8 +195,134 @@ $( document ).ready(function() {
 			  }); // 시군구 ajax end
 		});
 	   
+	// 법정동 선택하면 법정동 레이어 출력
+	   $('#bjd').change(function(){
+			  var selectBjd = $(this).val();
+			  var cql_filter2 = "bjd_cd = " + selectBjd;
+			  //var sggLon = $(this).find('option:selected').data('lon');
+		      //var sggLat = $(this).find('option:selected').data('lat');
+			 
+		     
+			  
+			  console.log(selectBjd);
+			  console.log(cql_filter2);
+				  
+			   if (bjdLayer) {
+			        	
+			        map.removeLayer(bjdLayer);	 
+			        
+			        }  
+			  
+			  // 시군구 레이어
+			  bjdLayer = new ol.layer.Tile({
+				name : 'selectedLayer',
+				visible : true,
+				source : new ol.source.TileWMS({
+					url : 'http://localhost:8080/geoserver/now/wms?service=WMS',
+					params : {
+						'version' : '1.1.0',
+						'request' : 'GetMap',
+						'CQL_FILTER' : cql_filter2,
+						'layers' : 'now:tl_bjd',
+						'bbox' : [1.3873946E7, 3906626.5, 1.4428045E7, 4670269.5],
+						'width' : '557',
+						'height' : '768',
+						'srs' : 'EPSG:3857',
+						'format' : 'image/png'
+					},
+					serverType : 'geoserver',
+				})
+			  });
+			  console.log(bjdLayer);
+			  map.addLayer(bjdLayer);
 	   })
-	        
+
+
+ $("#transmit").on("click", function() {
+          var test = $("#txtfile").val().split(".").pop();
+		
+          alert(test);
+         var formData = new FormData();
+         formData.append("testfile", $("#txtfile")[0].files[0]);
+         
+         if ($.inArray(test, [ 'txt' ]) == -1) {
+             alert("pem 파일만 업로드 할 수 있습니다.");
+             $("#txtfile").val("");
+             return false;
+          }
+         
+         $.ajax({
+             url : "/fileUpload.do",
+             type : 'post',
+             enctype : 'multipart/form-data',
+             //contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+             data : formData,
+             contentType : false,
+             processData : false,
+             beforeSend : function() {
+                modal();
+             },
+             success : function() {
+                $('#uploadtext').text("업로드 완료");
+                setTimeout(timeout,5000);
+             } 
+          })
+             
+       })
+
+   
+    var timeout = function(){
+      $('#mask').remove();
+      $('#loading').remove();
+      
+   }
+   function modal(){
+	      var maskHeight = $(document).height();
+	      var maskWidth = window.document.body.clientWidth;
+	      
+	      var mask = "<div id='mask' style='position:absolute;z-indx:5;background-color: rgba(0, 0, 0, 0.13);display:none;left:0;top:0;'></div>";
+	      var loading = "<div id='loading' style='background-color:white;width:500px'><h1 id='uploadtext' style='text-align:center'>업로드 진행중</h1></div>";
+	      
+	      $('body').append(mask);
+	      $('#mask').append(loading);
+	      
+	      $("#mask").css({
+	         'height':maskHeight,
+	         'width':maskWidth
+	      });
+	      
+	      $('#loading').css({
+	         /* 'position': 'absolute',
+	          'top': '50%',
+	           'left': '50%',
+	           'transform': 'translate(-50%, -50%)' */
+	         'position': 'absolute',
+	         'left': '800px',
+	         'top': '100px'
+
+	      })
+	      $('#mask').show();
+	      $('#loading').show();
+	   }
+
+	// 범례
+	function addLegend() {
+                // 범례 내용을 HTML 형식으로 작성합니다.
+                var legendContent = '<h4>범례</h4>' +
+                                    '<p>카테고리 1: <span style="color:red;">■</span></p>' +
+                                    '<p>카테고리 2: <span style="color:blue;">■</span></p>' +
+                                    '<p>카테고리 3: <span style="color:green;">■</span></p>';
+
+                // 범례를 지정한 div에 추가합니다.
+                $('#legend').html(legendContent);
+            }
+
+            // 페이지 로드 시 범례를 추가합니다.
+            addLegend();
+      
+	})
+	
+
 </script>
 </head>
 <body>
@@ -192,6 +330,9 @@ $( document ).ready(function() {
 <!-- 지도가 들어갈 영역 시작 -->
 <div id="map" class="map"></div>
 <!-- 지도가 들어갈 영역 끝 -->
+
+<!-- 주어진 코드에서 지도 영역 아래에 범례를 표시할 div를 추가합니다. -->
+<!-- <div id="legend" style="padding: 10px; background-color: white; position: absolute; float:right ; bottom: 10px; left: 10px; z-index: 1000;"></div> -->
 
 	
 	<div>
@@ -207,9 +348,16 @@ $( document ).ready(function() {
 	</select>
 	
 	<select id="bjd">
-		<option>-법정동-</option>
+		<option>-범례선택-</option>
 	</select>
+	
+	<!-- 파일 업로드하기 -->
+	<form id="uploadForm">
+    	<input type="file" accept=".txt" id="txtfile" name="txtfile">
+    </form>
+    <button id="transmit">전송하기</button>
 	</div>
+	
 </body>
 
 </html>

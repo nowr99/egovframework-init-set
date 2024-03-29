@@ -19,11 +19,13 @@
 	</select>
 	
 	<select id="sggList" resultType="servletDTO" parameterType="String">
-		SELECT distinct b.sgg_cd, b.sgg_nm FROM tl_sd a JOIN tl_sgg b ON a.sd_nm = b.sd_nm WHERE a.sd_cd = #{sido} AND b.geom IS NOT NULL ORDER BY b.sgg_nm ASC
+		SELECT distinct b.sgg_cd, b.sgg_nm, ST_X(ST_TRANSFORM(ST_Centroid(b.geom), 4326)) AS sgg_lon,
+    	ST_Y(ST_TRANSFORM(ST_Centroid(b.geom), 4326)) AS sgg_lat FROM tl_sd a JOIN tl_sgg b ON a.sd_nm = b.sd_nm WHERE a.sd_cd = #{sido} ORDER BY b.sgg_nm ASC
 	</select>
 	
 	<select id="bjdList" resultType="servletDTO" parameterType="String">
-		SELECT distinct b.bjd_cd, b.bjd_nm FROM tl_bjd b JOIN tl_sgg a ON a.sgg_cd = b.sgg_cd WHERE a.sgg_nm = #{sgg} ORDER BY b.bjd_nm ASC
+		SELECT distinct b.bjd_cd, b.bjd_nm, ST_X(ST_TRANSFORM(ST_Centroid(b.geom), 4326)) AS bjd_lon,
+    	ST_Y(ST_TRANSFORM(ST_Centroid(b.geom), 4326)) AS bjd_lat FROM tl_bjd b JOIN tl_sgg a ON a.sgg_cd = b.sgg_cd WHERE a.sgg_cd = #{sgg} ORDER BY b.bjd_nm ASC
 	</select>
 	
 </mapper>
