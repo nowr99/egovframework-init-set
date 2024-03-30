@@ -30,9 +30,7 @@ public class ServletController {
 		model.addAttribute("list", list);
 		return "main/main";
 	}
-	
-	
-	
+
 	@RequestMapping(value = "/test.do")
 	public String test() {
 		return "main/test";

@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="uploadFile">
+    
     <insert id="uploadFile" parameterType="Map">
-        INSERT INTO "TB_CARBON_B1" VALUES (#{year_month}, #{site_lo}, #{road_site_lo}, #{sgg_cd}, #{bjd_cd}, #{site_div_cd}, #{bun}, #{ji}, #{new_addr_no}, #{new_addr_road_cd}, #{new_addr_under_cd}, #{new_addr_main_no}, #{new_addr_sub_no}, #{used_khw})
+        INSERT INTO "TB_CARBON_B1" VALUES 
+        <foreach collection="list" item="d" separator=",">
+        (#{d.year_month}, null, null, #{d.sgg_cd}, #{d.bjd_cd}, null, null, null, null, null, null, null, null, #{d.used_khw})
+   		</foreach>
     </insert>
     
     <delete id="deleteTable">
     	DELETE FROM "TB_CARBON_B1"
     </delete>
+    
+    <update id="updateTable">
+	  REFRESH MATERIALIZED VIEW "b1_sgg_view";
+	  REFRESH MATERIALIZED VIEW "b1_bjd_view";
+	  REFRESH MATERIALIZED VIEW "b1_sd_view";
+	</update>
 </mapper>

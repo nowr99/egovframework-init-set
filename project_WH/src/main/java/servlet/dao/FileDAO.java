@@ -14,14 +14,15 @@ public class FileDAO {
 	private SqlSession sqlSession;
 
 	public void uploadFile(List<Map<String, Object>> list) {
-		for (Map<String, Object> data : list) {
-			sqlSession.insert("uploadFile.uploadFile", data);
-		}
-		
+			sqlSession.insert("uploadFile.uploadFile", list);
 	}
 
 	public void deleteTable() {
 		sqlSession.delete("uploadFile.deleteTable");
+	}
+
+	public void updateTable() {
+		sqlSession.update("uploadFile.updateTable");
 	}
 
 	

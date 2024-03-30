@@ -16,10 +16,10 @@
 <meta charset="UTF-8">
 <title>지도지도</title>
 
- <!-- Leaflet CSS 파일 -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <!-- Leaflet JavaScript 파일 -->
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<!-- Leaflet CSS 파일 -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<!-- Leaflet JavaScript 파일 -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v6.15.1/build/ol.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
@@ -201,9 +201,6 @@ $( document ).ready(function() {
 			  var cql_filter2 = "bjd_cd = " + selectBjd;
 			  //var sggLon = $(this).find('option:selected').data('lon');
 		      //var sggLat = $(this).find('option:selected').data('lat');
-			 
-		     
-			  
 			  console.log(selectBjd);
 			  console.log(cql_filter2);
 				  
