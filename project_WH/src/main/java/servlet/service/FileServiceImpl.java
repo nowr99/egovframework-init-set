@@ -38,14 +38,12 @@ public class FileServiceImpl implements FileService {
 			int i = 0;
 
 			while ((line = br.readLine()) != null) {
-				if (i == 15000) {
+				if (i == 16000) {
 					fileDAO.uploadFile(list);
 					list.clear();
 					i = 0;
 				}
-				if (result == 2100000) {
-					break;
-				}
+				
 
 				// 필요 없는 항목 주석처리하여 처리 속도 향상시키기
 				Map<String, Object> map = new HashMap<String, Object>();

@@ -31,6 +31,7 @@
 </style>
 <script type="text/javascript">
 var sdLayer;
+var sdLayer1;
 var sggLayer;
 var bjdLayer;
 
@@ -45,69 +46,14 @@ $( document ).ready(function() {
 	         })
 	         ],
 	        view: new ol.View({ // 지도가 보여 줄 중심좌표, 축소, 확대 등의 설정
-	        center: ol.proj.fromLonLat([128, 38]), // 128, 38
+	        center: ol.proj.fromLonLat([128, 36]), // 128, 38
 	        zoom: 7
 	        })
 	       });
 	   
-	   // 시도를 바꾸면 레이어 띄우고 시군구 출력
+	   // 시도를 바꾸면 시군구 출력
 	   $('#sido').on('change',function(){
 	        var selectSido = $(this).val();
-	        var sdLon = $(this).find('option:selected').data('lon');
-	        var sdLat = $(this).find('option:selected').data('lat');
-	        
-	        // 클릭하는 값에 따른 줌인, 줌아웃
-	        map.getView().setCenter(ol.proj.fromLonLat([sdLon, sdLat]));
-        	if (sdLon == 127.180516378024 && sdLat == 37.53646836591502 
-        			|| sdLon == 128.2997863336443 && sdLat == 37.72182212067617
-        			|| sdLon == 127.8318072559515 && sdLat == 36.740689905284555
-        			|| sdLon == 127.14287064989863 && sdLat == 35.716659228669535
-        			|| sdLon == 126.90130324480641 && sdLat == 34.87748508606095
-        			|| sdLon == 128.7490633797642 && sdLat == 36.35156109608353
-        			|| sdLon == 128.26116952805322 && sdLat == 35.32561264605758
-        			|| sdLon == 126.84898689042168 && sdLat == 36.53054996802068){
-		        map.getView().setZoom(9);
-        	} else {
-        		map.getView().setZoom(11);
-        	}
-	        
-        	var cql_filter = "sd_cd = " + selectSido;
-	       // console.log(selectSido);
-	       // console.log(cql_filter);
-	        var mapView = map.getView().calculateExtent();
-	 	  // console.log(mapView);
-	        
-	 	  
-	 
-	         
-	        if (sdLayer || sggLayer || bjdLayer) {
-	        map.removeLayer(sdLayer);	
-	        map.removeLayer(sggLayer);	
-	        map.removeLayer(bjdLayer);	
-	        } 
-	    	
-	        //시도 레이어 불러오기
-	   		sdLayer = new ol.layer.Tile({
-	   		name : 'selectedLayer',
-	   		visible: true,
-	   		source : new ol.source.TileWMS({
-	   			url : 'http://localhost:8080/geoserver/now/wms?service=WMS',
-	   			params : {
-	   				'version': '1.1.0',
-                    'request': 'GetMap',
-                    'CQL_FILTER': cql_filter,
-                    'layers': 'now:tl_sd',
-                    'bbox': [1.3871489341071218E7, 3910407.083927817, 1.4680011171788167E7, 4666488.829376997],
-                    'width': '768',
-                    'height': '718',
-                    'srs': 'EPSG:3857',
-                    'format': 'image/png'
-	   			},
-	   			serverType : 'geoserver',
-	   		})
-	   		});
-	   		map.addLayer(sdLayer);
-	   	
 	   		
 	   		// 시도 ajax
 	        $.ajax({
@@ -117,9 +63,7 @@ $( document ).ready(function() {
 	            dataType: 'json',
 	            success: function(response) {
 	                var selectSgg = $("#sgg");
-	                var selectBjdRe = $("#bjd");
 	                selectSgg.html("<option>-시/군/구-</option>");
-	                selectBjdRe.html("<option>-범례선택-</option>");
 	                for (var i = 0; i < response.length; i++) {
 	                    var item = response[i];
 	                    selectSgg.append("<option value='" + item.sgg_cd +"' data-lon = '"+ item.sgg_lon + "' data-lat = '" + item.sgg_lat + "'>" + item.sgg_nm + "</option>");
@@ -130,8 +74,6 @@ $( document ).ready(function() {
 	            }
 	        }); // 시도 ajax end    
 	   		
-	        
-	        
 	   		})
 	   
 	   // 시군구를 선택하면 시군구 레이어 출력, 법정동 출력
@@ -317,6 +259,182 @@ $( document ).ready(function() {
             // 페이지 로드 시 범례를 추가합니다.
             addLegend();
       
+            
+     	   // 아무것도 선택하지 않고 검색 눌렀을때 시도 레이어 띄우기
+     	   $('#search').on("click", function(){
+     		  var selectedLegend = $('#legend1 option:selected').text();
+     		  var selectedSido = $('#sido option:selected').text();
+     		  var selectedSgg = $('#sgg option:selected').text();
+     		  
+     		  var sd = $('#sido').val();
+     		  var sgg = $('#sgg').val();
+     		  console.log(sd);
+     		  console.log(sgg);
+     		  
+     		  var sdLon1 = $('#sido').find('option:selected').data('lon');
+ 	          var sdLat1 = $('#sido').find('option:selected').data('lat');
+     		  
+     		 	 if (sdLayer || sggLayer || bjdLayer || sdLayer1) {
+     			        map.removeLayer(sdLayer);	
+     			        map.removeLayer(sggLayer);	
+     			        map.removeLayer(bjdLayer);	
+     			        map.removeLayer(sdLayer1);	
+     			        } 
+     		 	 
+     		   if (selectedSido == "-시/도-" && selectedLegend == "natural break") {
+     		   sdLayer1 = new ol.layer.Tile({
+     		   		name : 'selectedLayer',
+     		   		visible: true,
+     		   		source : new ol.source.TileWMS({
+     		   			url : 'http://localhost:8080/geoserver/now/wms?service=WMS',
+     		   			params : {
+     		   				'version': '1.1.0',
+     	                    'request': 'GetMap',
+     	                    'layers': 'now:b1_sd_view',
+     	                    'bbox': [1.3871489341071218E7, 3910407.083927817, 1.4680011171788167E7, 4666488.829376997],
+     	                    'width': '768',
+     	                    'height': '718',
+     	                    'srs': 'EPSG:3857',
+     	                    'format': 'image/png'
+     		   			},
+     		   			serverType : 'geoserver',
+     		   		})
+     		   		});
+     		   		map.addLayer(sdLayer1);
+     		   		map.getView().setCenter(ol.proj.fromLonLat([128, 36]));
+     		     	map.getView().setZoom(7);
+     		   } else if (selectedSido == "-시/도-" && selectedLegend == "등간격"){
+     			  sdLayer1 = new ol.layer.Tile({
+       		   		name : 'selectedLayer',
+       		   		visible: true,
+       		   		source : new ol.source.TileWMS({
+       		   			url : 'http://localhost:8080/geoserver/now/wms?service=WMS',
+       		   			params : {
+       		   				'version': '1.1.0',
+       	                    'request': 'GetMap',
+       	                    'layers': 'now:b1_sd_view1',
+       	                    'bbox': [1.3871489341071218E7, 3910407.083927817, 1.4680011171788167E7, 4666488.829376997],
+       	                    'width': '768',
+       	                    'height': '718',
+       	                    'srs': 'EPSG:3857',
+       	                    'format': 'image/png'
+       		   			},
+       		   			serverType : 'geoserver',
+       		   		})
+       		   		});
+       		   		map.addLayer(sdLayer1);
+	       		   	map.getView().setCenter(ol.proj.fromLonLat([128, 36]));
+	 		     	map.getView().setZoom(7);
+     		   } else if (selectedSido != "-시/도-" && selectedSgg == "-시/군/구-" && selectedLegend == "natural break") {
+     			    var sdLon = $('#sido').find('option:selected').data('lon');
+     		        var sdLat = $('#sido').find('option:selected').data('lat');
+     		        var selectSido1 = $('#sido').val();
+     		        // 클릭하는 값에 따른 줌인, 줌아웃
+     		        map.getView().setCenter(ol.proj.fromLonLat([sdLon, sdLat]));
+     	        	if (sdLon == 127.180516378024 && sdLat == 37.53646836591502 
+     	        			|| sdLon == 128.2997863336443 && sdLat == 37.72182212067617
+     	        			|| sdLon == 127.8318072559515 && sdLat == 36.740689905284555
+     	        			|| sdLon == 127.14287064989863 && sdLat == 35.716659228669535
+     	        			|| sdLon == 126.90130324480641 && sdLat == 34.87748508606095
+     	        			|| sdLon == 128.7490633797642 && sdLat == 36.35156109608353
+     	        			|| sdLon == 128.26116952805322 && sdLat == 35.32561264605758
+     	        			|| sdLon == 126.84898689042168 && sdLat == 36.53054996802068){
+     			        map.getView().setZoom(9);
+     	        	} else {
+     	        		map.getView().setZoom(11);
+     	        	}
+     		        
+     	        	var cql_filter = "sd_cd = " + selectSido1;
+     		       // console.log(selectSido);
+     		       // console.log(cql_filter);
+     		         
+     		        if (sdLayer || sggLayer || bjdLayer || sdLayer1) {
+     		        map.removeLayer(sdLayer);	
+     		        map.removeLayer(sggLayer);	
+     		        map.removeLayer(bjdLayer);	
+     		        map.removeLayer(sdLayer1);	
+     		        } 
+     		    	
+     		        //시도 레이어 불러오기
+     		   		sdLayer = new ol.layer.Tile({
+     		   		name : 'selectedLayer',
+     		   		visible: true,
+     		   		source : new ol.source.TileWMS({
+     		   			url : 'http://localhost:8080/geoserver/now/wms?service=WMS',
+     		   			params : {
+     		   				'version': '1.1.0',
+     	                    'request': 'GetMap',
+     	                    'CQL_FILTER': cql_filter,
+     	                    'layers': 'now:b1_sd_view',
+     	                    'bbox': [1.3871489341071218E7, 3910407.083927817, 1.4680011171788167E7, 4666488.829376997],
+     	                    'width': '768',
+     	                    'height': '718',
+     	                    'srs': 'EPSG:3857',
+     	                    'format': 'image/png'
+     		   			},
+     		   			serverType : 'geoserver',
+     		   		})
+     		   		});
+     		   		map.addLayer(sdLayer);
+     		   	
+     		   } else if (selectedSido != "-시/도-" && selectedSgg == "-시/군/구-" && selectedLegend == "등간격") {
+     			    var sdLon = $('#sido').find('option:selected').data('lon');
+     		        var sdLat = $('#sido').find('option:selected').data('lat');
+     		        var selectSido1 = $('#sido').val();
+     		        // 클릭하는 값에 따른 줌인, 줌아웃
+     		        map.getView().setCenter(ol.proj.fromLonLat([sdLon, sdLat]));
+     	        	if (sdLon == 127.180516378024 && sdLat == 37.53646836591502 
+     	        			|| sdLon == 128.2997863336443 && sdLat == 37.72182212067617
+     	        			|| sdLon == 127.8318072559515 && sdLat == 36.740689905284555
+     	        			|| sdLon == 127.14287064989863 && sdLat == 35.716659228669535
+     	        			|| sdLon == 126.90130324480641 && sdLat == 34.87748508606095
+     	        			|| sdLon == 128.7490633797642 && sdLat == 36.35156109608353
+     	        			|| sdLon == 128.26116952805322 && sdLat == 35.32561264605758
+     	        			|| sdLon == 126.84898689042168 && sdLat == 36.53054996802068){
+     			        map.getView().setZoom(9);
+     	        	} else {
+     	        		map.getView().setZoom(11);
+     	        	}
+     		        
+     	        	var cql_filter = "sd_cd = " + selectSido1;
+     		       // console.log(selectSido);
+     		       // console.log(cql_filter);
+     		         
+     		        if (sdLayer || sggLayer || bjdLayer || sdLayer1) {
+     		        map.removeLayer(sdLayer);	
+     		        map.removeLayer(sggLayer);	
+     		        map.removeLayer(bjdLayer);	
+     		        map.removeLayer(sdLayer1);	
+     		        } 
+     		    	
+     		        //시도 레이어 불러오기
+     		   		sdLayer = new ol.layer.Tile({
+     		   		name : 'selectedLayer',
+     		   		visible: true,
+     		   		source : new ol.source.TileWMS({
+     		   			url : 'http://localhost:8080/geoserver/now/wms?service=WMS',
+     		   			params : {
+     		   				'version': '1.1.0',
+     	                    'request': 'GetMap',
+     	                    'CQL_FILTER': cql_filter,
+     	                    'layers': 'now:b1_sd_view1',
+     	                    'bbox': [1.3871489341071218E7, 3910407.083927817, 1.4680011171788167E7, 4666488.829376997],
+     	                    'width': '768',
+     	                    'height': '718',
+     	                    'srs': 'EPSG:3857',
+     	                    'format': 'image/png'
+     		   			},
+     		   			serverType : 'geoserver',
+     		   		})
+     		   		});
+     		   		map.addLayer(sdLayer);
+     		   	
+     		   } else if (selectedLegend == "-범례선택-") {
+     		   
+     			   alert ("범례를 선택 해주세요.");
+     		   }
+     		  
+     	   });
 	})
 	
 
@@ -344,9 +462,13 @@ $( document ).ready(function() {
 		<option>-시/군/구-</option>
 	</select>
 	
-	<select id="bjd">
+	<select id="legend1">
 		<option>-범례선택-</option>
+		<option>등간격</option>
+		<option>natural break</option>
 	</select>
+	
+	<button id="search">검색</button>
 	
 	<!-- 파일 업로드하기 -->
 	<form id="uploadForm">
