@@ -32,7 +32,10 @@ public class ServletController {
 	}
 
 	@RequestMapping(value = "/test.do")
-	public String test() {
+	public String main1(Model model) throws Exception {
+		List<ServletDTO> list = new ArrayList<ServletDTO>();
+		list = servletService.sidoList();
+		model.addAttribute("list", list);
 		return "main/test";
 	}
 }

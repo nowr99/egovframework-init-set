@@ -15,7 +15,7 @@
 	
 	<select id="sidoList" resultType="servletDTO">
 		SELECT distinct sd_cd, sd_nm, ST_X(ST_TRANSFORM(ST_Centroid(geom), 4326)) AS sd_lon,
-    	ST_Y(ST_TRANSFORM(ST_Centroid(geom), 4326)) AS sd_lat FROM tl_sd ORDER BY sd_nm ASC
+    	ST_Y(ST_TRANSFORM(ST_Centroid(geom), 4326)) AS sd_lat FROM tl_sd  ORDER BY sd_nm ASC
 	</select>
 	
 	<select id="sggList" resultType="servletDTO" parameterType="String">

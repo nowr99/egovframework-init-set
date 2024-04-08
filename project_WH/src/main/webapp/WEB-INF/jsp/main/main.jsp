@@ -16,10 +16,6 @@
 <meta charset="UTF-8">
 <title>지도지도</title>
 
-<!-- Leaflet CSS 파일 -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-<!-- Leaflet JavaScript 파일 -->
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v6.15.1/build/ol.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
@@ -27,6 +23,13 @@
 .map {
 	height: 650px;
     width: 80%;
+
+
+}
+#legend-container {
+	position: absolute;
+	bottom: 100px;
+	right: 400px;
 }
 </style>
 <script type="text/javascript">
@@ -47,7 +50,9 @@ $( document ).ready(function() {
 	         ],
 	        view: new ol.View({ // 지도가 보여 줄 중심좌표, 축소, 확대 등의 설정
 	        center: ol.proj.fromLonLat([128, 36]), // 128, 38
-	        zoom: 7
+	        zoom: 7,
+	        minZoom : 7,
+            maxZoom : 17 
 	        })
 	       });
 	   
@@ -76,46 +81,9 @@ $( document ).ready(function() {
 	   		
 	   		})
 	   
-	   // 시군구를 선택하면 시군구 레이어 출력, 법정동 출력
+	   // 시군구를 법정동 출력
 	   $('#sgg').change(function(){
 			  var selectSgg = $(this).val();
-			  var cql_filter1 = "sgg_cd = " + selectSgg;
-			  var sggLon = $(this).find('option:selected').data('lon');
-		      var sggLat = $(this).find('option:selected').data('lat');
-			 
-		      map.getView().setCenter(ol.proj.fromLonLat([sggLon, sggLat]));
-		      map.getView().setZoom(12);
-			  
-			  console.log(selectSgg);
-			  console.log(cql_filter1);
-				  
-			   if (sggLayer) {
-			        map.removeLayer(sggLayer);	
-			        map.removeLayer(bjdLayer);	
-			        }  
-			  
-			  // 시군구 레이어
-			  sggLayer = new ol.layer.Tile({
-				name : 'selectedLayer',
-				visible : true,
-				source : new ol.source.TileWMS({
-					url : 'http://localhost:8080/geoserver/now/wms?service=WMS',
-					params : {
-						'version' : '1.1.0',
-						'request' : 'GetMap',
-						'CQL_FILTER' : cql_filter1,
-						'layers' : 'now:tl_sgg',
-						'bbox' : [1.386872E7, 3906626.5, 1.4428071E7, 4670269.5],
-						'width' : '768',
-						'height' : '718',
-						'srs' : 'EPSG:3857',
-						'format' : 'image/png'
-					},
-					serverType : 'geoserver',
-				})
-			  });
-			  console.log(sggLayer);
-			  map.addLayer(sggLayer);
 			  
 			  // 시군구 ajax
 			  $.ajax({
@@ -125,7 +93,7 @@ $( document ).ready(function() {
 					dataType: 'json',
 					success: function(response) {
 						var selectBjd = $("#bjd");
-						selectBjd.html("<option>-범례선택-</option>");
+						selectBjd.html("<option>-법정동-</option>");
 						for (var i = 0; i < response.length; i++) {
 							var item = response[i];
 							selectBjd.append ("<option value='"+item.bjd_cd+"'>" + item.bjd_nm + "</option>");
@@ -147,9 +115,7 @@ $( document ).ready(function() {
 			  console.log(cql_filter2);
 				  
 			   if (bjdLayer) {
-			        	
 			        map.removeLayer(bjdLayer);	 
-			        
 			        }  
 			  
 			  // 시군구 레이어
@@ -243,21 +209,14 @@ $( document ).ready(function() {
 	      $('#mask').show();
 	      $('#loading').show();
 	   }
-
-	// 범례
-	function addLegend() {
-                // 범례 내용을 HTML 형식으로 작성합니다.
-                var legendContent = '<h4>범례</h4>' +
-                                    '<p>카테고리 1: <span style="color:red;">■</span></p>' +
-                                    '<p>카테고리 2: <span style="color:blue;">■</span></p>' +
-                                    '<p>카테고리 3: <span style="color:green;">■</span></p>';
-
-                // 범례를 지정한 div에 추가합니다.
-                $('#legend').html(legendContent);
-            }
-
-            // 페이지 로드 시 범례를 추가합니다.
-            addLegend();
+	
+   // 범례 숨기기
+   function hideLegend() {
+	    var legendContainer1 = document.querySelector('#legend-container');
+	    if (legendContainer1) {
+	        legendContainer1.parentNode.removeChild(legendContainer1);
+	    }
+	}
       
             
      	   // 아무것도 선택하지 않고 검색 눌렀을때 시도 레이어 띄우기
@@ -300,10 +259,37 @@ $( document ).ready(function() {
      		   			serverType : 'geoserver',
      		   		})
      		   		});
+     		   		hideLegend();
      		   		map.addLayer(sdLayer1);
      		   		map.getView().setCenter(ol.proj.fromLonLat([128, 36]));
      		     	map.getView().setZoom(7);
+     		     	
+     		    // 범례 이미지를 감싸는 새로운 <div> 요소를 만듭니다.
+     		     	var legendContainer = document.createElement('div');
+     		     	legendContainer.setAttribute('id', 'legend-container');
+     		     	// 맵 요소의 상대적인 위치에 범례 컨테이너를 추가합니다.
+     		     	map.getTargetElement().appendChild(legendContainer);
+
+     		     	// 범례 이미지 요청을 위한 URL 생성
+     		     	legendUrl = 'http://localhost:8080/geoserver/now/wms?' +
+     		     	    'service=WMS' +
+     		     	    '&VERSION=1.0.0' +
+     		     	    '&REQUEST=GetLegendGraphic' +
+     		     	    '&LAYER=now:b1_sd_view' +
+     		     	    '&FORMAT=image/png' +
+     		     	    '&WIDTH=80' +
+     		     	    '&HEIGHT=20';
+
+     		     	// 범례 이미지를 추가할 HTML <img> 엘리먼트를 생성합니다.
+     		     	var legendImg = document.createElement('img');
+     		     	legendImg.src = legendUrl;
+
+     		     	// 범례 이미지를 범례 컨테이너에 추가합니다.
+     		     	legendContainer.appendChild(legendImg);
+     		     	
+     		     	
      		   } else if (selectedSido == "-시/도-" && selectedLegend == "등간격"){
+     			
      			  sdLayer1 = new ol.layer.Tile({
        		   		name : 'selectedLayer',
        		   		visible: true,
@@ -322,9 +308,35 @@ $( document ).ready(function() {
        		   			serverType : 'geoserver',
        		   		})
        		   		});
+     				hideLegend();
        		   		map.addLayer(sdLayer1);
 	       		   	map.getView().setCenter(ol.proj.fromLonLat([128, 36]));
 	 		     	map.getView().setZoom(7);
+	 		     
+	 		     	var legendContainer = document.createElement('div');
+     		     	legendContainer.setAttribute('id', 'legend-container');
+     		     	// 맵 요소의 상대적인 위치에 범례 컨테이너를 추가합니다.
+     		     	map.getTargetElement().appendChild(legendContainer);
+
+     		     	// 범례 이미지 요청을 위한 URL 생성
+     		     	legendUrl = 'http://localhost:8080/geoserver/now/wms?' +
+     		     	    'service=WMS' +
+     		     	    '&VERSION=1.0.0' +
+     		     	    '&REQUEST=GetLegendGraphic' +
+     		     	    '&LAYER=now:b1_sd_view1' +
+     		     	    '&FORMAT=image/png' +
+     		     	    '&WIDTH=80' +
+     		     	    '&HEIGHT=20';
+
+     		     	// 범례 이미지를 추가할 HTML <img> 엘리먼트를 생성합니다.
+     		     	var legendImg = document.createElement('img');
+     		     	legendImg.src = legendUrl;
+
+     		     	// 범례 이미지를 범례 컨테이너에 추가합니다.
+     		     	legendContainer.appendChild(legendImg);
+	 		     	
+	 		     	
+	 		     	
      		   } else if (selectedSido != "-시/도-" && selectedSgg == "-시/군/구-" && selectedLegend == "natural break") {
      			    var sdLon = $('#sido').find('option:selected').data('lon');
      		        var sdLat = $('#sido').find('option:selected').data('lat');
@@ -339,12 +351,13 @@ $( document ).ready(function() {
      	        			|| sdLon == 128.7490633797642 && sdLat == 36.35156109608353
      	        			|| sdLon == 128.26116952805322 && sdLat == 35.32561264605758
      	        			|| sdLon == 126.84898689042168 && sdLat == 36.53054996802068){
-     			        map.getView().setZoom(9);
+     			        
+     	        		map.getView().setZoom(9);
      	        	} else {
      	        		map.getView().setZoom(11);
      	        	}
      		        
-     	        	var cql_filter = "sd_cd = " + selectSido1;
+     	        	var cql_filter = "sgg_cd like " + "'" + selectSido1 + "%'";
      		       // console.log(selectSido);
      		       // console.log(cql_filter);
      		         
@@ -365,7 +378,7 @@ $( document ).ready(function() {
      		   				'version': '1.1.0',
      	                    'request': 'GetMap',
      	                    'CQL_FILTER': cql_filter,
-     	                    'layers': 'now:b1_sd_view',
+     	                    'layers': 'now:b1_sgg_view',
      	                    'bbox': [1.3871489341071218E7, 3910407.083927817, 1.4680011171788167E7, 4666488.829376997],
      	                    'width': '768',
      	                    'height': '718',
@@ -375,7 +388,32 @@ $( document ).ready(function() {
      		   			serverType : 'geoserver',
      		   		})
      		   		});
+     		        hideLegend();
      		   		map.addLayer(sdLayer);
+     		   		
+     		   	var legendContainer = document.createElement('div');
+ 		     	legendContainer.setAttribute('id', 'legend-container');
+ 		     	// 맵 요소의 상대적인 위치에 범례 컨테이너를 추가합니다.
+ 		     	map.getTargetElement().appendChild(legendContainer);
+
+ 		     	// 범례 이미지 요청을 위한 URL 생성
+ 		     	legendUrl = 'http://localhost:8080/geoserver/now/wms?' +
+ 		     	    'service=WMS' +
+ 		     	    '&VERSION=1.0.0' +
+ 		     	    '&REQUEST=GetLegendGraphic' +
+ 		     	    '&LAYER=now:b1_sgg_view' +
+ 		     	    '&FORMAT=image/png' +
+ 		     	    '&WIDTH=80' +
+ 		     	    '&HEIGHT=20';
+
+ 		     	// 범례 이미지를 추가할 HTML <img> 엘리먼트를 생성합니다.
+ 		     	var legendImg = document.createElement('img');
+ 		     	legendImg.src = legendUrl;
+
+ 		     	// 범례 이미지를 범례 컨테이너에 추가합니다.
+ 		     	legendContainer.appendChild(legendImg);
+     		   		
+     		   		
      		   	
      		   } else if (selectedSido != "-시/도-" && selectedSgg == "-시/군/구-" && selectedLegend == "등간격") {
      			    var sdLon = $('#sido').find('option:selected').data('lon');
@@ -396,7 +434,7 @@ $( document ).ready(function() {
      	        		map.getView().setZoom(11);
      	        	}
      		        
-     	        	var cql_filter = "sd_cd = " + selectSido1;
+     	        	var cql_filter = "sgg_cd like " + "'" + selectSido1 + "%'";
      		       // console.log(selectSido);
      		       // console.log(cql_filter);
      		         
@@ -417,7 +455,7 @@ $( document ).ready(function() {
      		   				'version': '1.1.0',
      	                    'request': 'GetMap',
      	                    'CQL_FILTER': cql_filter,
-     	                    'layers': 'now:b1_sd_view1',
+     	                    'layers': 'now:b1_sgg_view1',
      	                    'bbox': [1.3871489341071218E7, 3910407.083927817, 1.4680011171788167E7, 4666488.829376997],
      	                    'width': '768',
      	                    'height': '718',
@@ -427,16 +465,156 @@ $( document ).ready(function() {
      		   			serverType : 'geoserver',
      		   		})
      		   		});
+     		        hideLegend();
      		   		map.addLayer(sdLayer);
-     		   	
-     		   } else if (selectedLegend == "-범례선택-") {
-     		   
-     			   alert ("범례를 선택 해주세요.");
-     		   }
-     		  
+     		   		
+     		   	var legendContainer = document.createElement('div');
+ 		     	legendContainer.setAttribute('id', 'legend-container');
+ 		     	// 맵 요소의 상대적인 위치에 범례 컨테이너를 추가합니다.
+ 		     	map.getTargetElement().appendChild(legendContainer);
+
+ 		     	// 범례 이미지 요청을 위한 URL 생성
+ 		     	legendUrl = 'http://localhost:8080/geoserver/now/wms?' +
+ 		     	    'service=WMS' +
+ 		     	    '&VERSION=1.0.0' +
+ 		     	    '&REQUEST=GetLegendGraphic' +
+ 		     	    '&LAYER=now:b1_sgg_view1' +
+ 		     	    '&FORMAT=image/png' +
+ 		     	    '&WIDTH=80' +
+ 		     	    '&HEIGHT=20';
+
+ 		     	// 범례 이미지를 추가할 HTML <img> 엘리먼트를 생성합니다.
+ 		     	var legendImg = document.createElement('img');
+ 		     	legendImg.src = legendUrl;
+
+ 		     	// 범례 이미지를 범례 컨테이너에 추가합니다.
+ 		     	legendContainer.appendChild(legendImg);
+     		   		
+     		  } else if (selectedLegend == "-범례선택-") {
+        		   
+    			   alert ("범례를 선택 해주세요.");
+    		   }
+    		  
+     		   		
+     		  // 시군구에 법정동 포함 레이어 natural break
+     		  if (selectedSgg != "-시/군/구-" && selectedLegend == "natural break") {
+  			  var cql_filter = "bjd_cd like " + "'" + sgg + "%'";
+  			  var sggLon = $('#sgg').find('option:selected').data('lon');
+  		      var sggLat = $('#sgg').find('option:selected').data('lat');
+  			 
+  		      map.getView().setCenter(ol.proj.fromLonLat([sggLon, sggLat]));
+  		      map.getView().setZoom(12);
+  				  
+  			   if (sggLayer) {
+  			        map.removeLayer(sggLayer);	
+  			        }  
+  			   
+  			  sggLayer = new ol.layer.Tile({
+  				name : 'selectedLayer',
+  				visible : true,
+  				source : new ol.source.TileWMS({
+  					url : 'http://localhost:8080/geoserver/now/wms?service=WMS',
+  					params : {
+  						'version' : '1.1.0',
+  						'request' : 'GetMap',
+  						'CQL_FILTER' : cql_filter,
+  						'layers' : 'now:b1_bjd_view',
+  						'bbox' : [1.386872E7, 3906626.5, 1.4428071E7, 4670269.5],
+  						'width' : '768',
+  						'height' : '718',
+  						'srs' : 'EPSG:3857',
+  						'format' : 'image/png'
+  					},
+  					serverType : 'geoserver',
+  				})
+  			  });
+  			  console.log(sggLayer);
+  			  hideLegend();
+  			  map.addLayer(sggLayer);
+     		   		
+  			var legendContainer = document.createElement('div');
+		     	legendContainer.setAttribute('id', 'legend-container');
+		     	// 맵 요소의 상대적인 위치에 범례 컨테이너를 추가합니다.
+		     	map.getTargetElement().appendChild(legendContainer);
+
+		     	// 범례 이미지 요청을 위한 URL 생성
+		     	legendUrl = 'http://localhost:8080/geoserver/now/wms?' +
+		     	    'service=WMS' +
+		     	    '&VERSION=1.0.0' +
+		     	    '&REQUEST=GetLegendGraphic' +
+		     	    '&LAYER=now:b1_bjd_view' +
+		     	    '&FORMAT=image/png' +
+		     	    '&WIDTH=80' +
+		     	    '&HEIGHT=20';
+
+		     	// 범례 이미지를 추가할 HTML <img> 엘리먼트를 생성합니다.
+		     	var legendImg = document.createElement('img');
+		     	legendImg.src = legendUrl;
+
+		     	// 범례 이미지를 범례 컨테이너에 추가합니다.
+		     	legendContainer.appendChild(legendImg);
+  			  
+  			   } else if (selectedSgg != "-시/군/구-" && selectedLegend == "등간격") {
+  				 var cql_filter = "bjd_cd like " + "'" + sgg + "%'";
+  	  			  var sggLon = $('#sgg').find('option:selected').data('lon');
+  	  		      var sggLat = $('#sgg').find('option:selected').data('lat');
+  	  			 
+  	  		      map.getView().setCenter(ol.proj.fromLonLat([sggLon, sggLat]));
+  	  		      map.getView().setZoom(12);
+  	  				  
+  	  			   if (sggLayer) {
+  	  			        map.removeLayer(sggLayer);	
+  	  			        }  
+  	  			   
+  	  			  sggLayer = new ol.layer.Tile({
+  	  				name : 'selectedLayer',
+  	  				visible : true,
+  	  				source : new ol.source.TileWMS({
+  	  					url : 'http://localhost:8080/geoserver/now/wms?service=WMS',
+  	  					params : {
+  	  						'version' : '1.1.0',
+  	  						'request' : 'GetMap',
+  	  						'CQL_FILTER' : cql_filter,
+  	  						'layers' : 'now:b1_bjd_view1',
+  	  						'bbox' : [1.386872E7, 3906626.5, 1.4428071E7, 4670269.5],
+  	  						'width' : '768',
+  	  						'height' : '718',
+  	  						'srs' : 'EPSG:3857',
+  	  						'format' : 'image/png'
+  	  					},
+  	  					serverType : 'geoserver',
+  	  				})
+  	  			  });
+  	  			  console.log(sggLayer);
+  	  			  hideLegend();
+  	  			  map.addLayer(sggLayer);
+  	  			  
+  	  			var legendContainer = document.createElement('div');
+ 		     	legendContainer.setAttribute('id', 'legend-container');
+ 		     	// 맵 요소의 상대적인 위치에 범례 컨테이너를 추가합니다.
+ 		     	map.getTargetElement().appendChild(legendContainer);
+
+ 		     	// 범례 이미지 요청을 위한 URL 생성
+ 		     	legendUrl = 'http://localhost:8080/geoserver/now/wms?' +
+ 		     	    'service=WMS' +
+ 		     	    '&VERSION=1.0.0' +
+ 		     	    '&REQUEST=GetLegendGraphic' +
+ 		     	    '&LAYER=now:b1_bjd_view1' +
+ 		     	    '&FORMAT=image/png' +
+ 		     	    '&WIDTH=80' +
+ 		     	    '&HEIGHT=20';
+
+ 		     	// 범례 이미지를 추가할 HTML <img> 엘리먼트를 생성합니다.
+ 		     	var legendImg = document.createElement('img');
+ 		     	legendImg.src = legendUrl;
+
+ 		     	// 범례 이미지를 범례 컨테이너에 추가합니다.
+ 		     	legendContainer.appendChild(legendImg);
+  	  			  
+  			   }
+     		   		
      	   });
 	})
-	
 
 </script>
 </head>
