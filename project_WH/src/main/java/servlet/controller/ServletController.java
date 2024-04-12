@@ -21,13 +21,10 @@ import servlet.service.ServletService;
 public class ServletController {
 	@Resource(name = "ServletService")
 	private ServletService servletService;
-	
-	
-	@RequestMapping(value = "/main.do")
-	public String main(Model model) throws Exception {
-		List<ServletDTO> list = new ArrayList<ServletDTO>();
-		list = servletService.sidoList();
-		model.addAttribute("list", list);
+
+	@RequestMapping(value = "/main.do", method = RequestMethod.GET)
+	public String main() throws Exception {
+		
 		return "main/main";
 	}
 
@@ -37,5 +34,27 @@ public class ServletController {
 		list = servletService.sidoList();
 		model.addAttribute("list", list);
 		return "main/test";
+	}
+
+	@RequestMapping(value = "/upLoad.do", method = RequestMethod.GET)
+	public String upLoad() {
+
+		return "main/upLoad";
+	}
+	
+	@RequestMapping(value = "/mapp.do", method = RequestMethod.GET)
+	public String mapp(Model model) throws Exception {
+		List<ServletDTO> list = new ArrayList<ServletDTO>();
+		list = servletService.sidoList();
+		model.addAttribute("list", list);
+		return "main/mapp";
+	}
+
+	@RequestMapping(value = "/statistics.do", method = RequestMethod.GET)
+	public String statistics(Model model) throws Exception {
+		List<ServletDTO> list = new ArrayList<ServletDTO>();
+		list = servletService.sidoList();
+		model.addAttribute("list", list);
+		return "main/statistics";
 	}
 }

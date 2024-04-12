@@ -28,4 +28,16 @@
     	ST_Y(ST_TRANSFORM(ST_Centroid(b.geom), 4326)) AS bjd_lat FROM tl_bjd b JOIN tl_sgg a ON a.sgg_cd = b.sgg_cd WHERE a.sgg_cd = #{sgg} ORDER BY b.bjd_nm ASC
 	</select>
 	
+	<select id="allselec" resultType="Map"> 
+		SELECT DISTINCT sd_nm, sd_cd, SUM(totalused) OVER (PARTITION BY sd_nm) AS sidototalused FROM b1_sd_view 
+	</select>
+	
+	<select id="siSelecChart" resultType="Map" parameterType="String">
+		 SELECT DISTINCT sd_nm, sd_cd, totalused FROM b1_sd_view WHERE sd_cd = #{sdCd1}; 
+	</select>
+	
+	<select id="siSelecTable" resultType="Map" parameterType="String"> 
+		SELECT DISTINCT sgg_nm, sgg_cd, sd_nm, sd_cd, totalused FROM b1_sd_view WHERE sd_cd = #{sdCd1}; 
+	</select>
+	
 </mapper>
