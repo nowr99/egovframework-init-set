@@ -131,9 +131,6 @@ $( document ).ready(function() {
                         <div class="upLoad align-middle border-bottom border-dark py-2" id="menu">
                             <i class="bi fs-5 ps-3 pe-1"></i>업로드
                         </div>
-                        <div class="statistics align-middle border-bottom border-dark py-2" id="menu">
-                            <i class="bi fs-5 ps-3 pe-1"></i>통계
-                        </div>
                 </div>
                 <div id ="views" class="col-md-9 p-3 fs-4 bold border border-dark border-top-0" style="height: 600px;">
 					메뉴를 선택하세요.

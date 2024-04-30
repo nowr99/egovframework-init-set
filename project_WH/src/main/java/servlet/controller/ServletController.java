@@ -49,12 +49,4 @@ public class ServletController {
 		model.addAttribute("list", list);
 		return "main/mapp";
 	}
-
-	@RequestMapping(value = "/statistics.do", method = RequestMethod.GET)
-	public String statistics(Model model) throws Exception {
-		List<ServletDTO> list = new ArrayList<ServletDTO>();
-		list = servletService.sidoList();
-		model.addAttribute("list", list);
-		return "main/statistics";
-	}
 }

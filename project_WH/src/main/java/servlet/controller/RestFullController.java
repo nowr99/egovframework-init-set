@@ -37,14 +37,6 @@ public class RestFullController {
 		return list1;
 	}
 
-	// 법정동 선택 ajax 받기
-	@RequestMapping(value = "/selectSgg.do", method = RequestMethod.POST)
-	public List<ServletDTO> selectSgg(@RequestParam("sgg") String sgg) {
-		List<ServletDTO> list2 = new ArrayList<ServletDTO>();
-		list2 = servletService.bjdList(sgg);
-
-		return list2;
-	}
 
 	// 파일업로드
 	@RequestMapping(value = "/fileUpload.do", method = RequestMethod.POST)

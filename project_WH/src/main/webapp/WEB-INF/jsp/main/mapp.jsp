@@ -28,7 +28,8 @@ var sggLayer;
 var bjdLayer;
 
 $( document ).ready(function() {
-	 // 시도를 바꾸면 시군구 출력
+	
+	// 시도를 바꾸면 시군구 출력
 	   $('#sido').on('change',function(){
 	        var selectSido = $(this).val();
 	   		
@@ -53,39 +54,15 @@ $( document ).ready(function() {
 	   		
 	   		})
 	   
-	   // 시군구를 법정동 출력
-	   $('#sgg').change(function(){
-			  var selectSgg = $(this).val();
-			  
-			  // 시군구 ajax
-			  $.ajax({
-					url: '/selectSgg.do',
-					type: 'post',
-					data: {"sgg": selectSgg},
-					dataType: 'json',
-					success: function(response) {
-						var selectBjd = $("#bjd");
-						selectBjd.html("<option>-법정동-</option>");
-						for (var i = 0; i < response.length; i++) {
-							var item = response[i];
-							selectBjd.append ("<option value='"+item.bjd_cd+"'>" + item.bjd_nm + "</option>");
-						}
-					},
-					error : function(xhr, status, error){
-						alert(xhr + "---" + error + 'ajax 오류' + selectSgg + "," + selectBjd);
-					}
-			  }); // 시군구 ajax end
-		});
-
-
-// 범례 숨기기
-function hideLegend() {
-	    var legendContainer1 = document.querySelector('#legend-container');
-	    if (legendContainer1) {
-	        legendContainer1.parentNode.removeChild(legendContainer1);
-	    }
-}
-   
+	  
+		// 범례 숨기기
+		function hideLegend() {
+			    var legendContainer1 = document.querySelector('#legend-container');
+			    if (legendContainer1) {
+			        legendContainer1.parentNode.removeChild(legendContainer1);
+			    }
+		}
+		   
          
   	   // 아무것도 선택하지 않고 검색 눌렀을때 시도 레이어 띄우기
   	   $('#search').on("click", function(){
@@ -132,10 +109,11 @@ function hideLegend() {
   		   		map.getView().setCenter(ol.proj.fromLonLat([128, 36]));
   		     	map.getView().setZoom(7);
   		     	
-  		    // 범례 이미지를 감싸는 새로운 <div> 요소를 만듭니다.
+  		    // 범례 이미지를 감싸는 새로운 <div> 요소를 만들기
   		     	var legendContainer = document.createElement('div');
   		     	legendContainer.setAttribute('id', 'legend-container');
-  		     	// 맵 요소의 상대적인 위치에 범례 컨테이너를 추가합니다.
+  		     	
+  		     	// 상대적인 위치에 범례 컨테이너를 추가
   		     	map.getTargetElement().appendChild(legendContainer);
 
   		     	// 범례 이미지 요청을 위한 URL 생성
@@ -148,11 +126,11 @@ function hideLegend() {
   		     	    '&WIDTH=80' +
   		     	    '&HEIGHT=20';
 
-  		     	// 범례 이미지를 추가할 HTML <img> 엘리먼트를 생성합니다.
+  		     	// 범례 이미지를 추가할 HTML <img> 엘리먼트를 생성
   		     	var legendImg = document.createElement('img');
   		     	legendImg.src = legendUrl;
 
-  		     	// 범례 이미지를 범례 컨테이너에 추가합니다.
+  		     	// 범례 이미지를 범례 컨테이너에 추가
   		     	legendContainer.appendChild(legendImg);
   		     	
   		     	
@@ -183,7 +161,7 @@ function hideLegend() {
 	 		     
 	 		     	var legendContainer = document.createElement('div');
   		     	legendContainer.setAttribute('id', 'legend-container');
-  		     	// 맵 요소의 상대적인 위치에 범례 컨테이너를 추가합니다.
+  		     	// 상대적인 위치에 범례 컨테이너를 추가
   		     	map.getTargetElement().appendChild(legendContainer);
 
   		     	// 범례 이미지 요청을 위한 URL 생성
@@ -196,11 +174,11 @@ function hideLegend() {
   		     	    '&WIDTH=80' +
   		     	    '&HEIGHT=20';
 
-  		     	// 범례 이미지를 추가할 HTML <img> 엘리먼트를 생성합니다.
+  		     	// 범례 이미지를 추가할 HTML <img> 엘리먼트를 생성
   		     	var legendImg = document.createElement('img');
   		     	legendImg.src = legendUrl;
 
-  		     	// 범례 이미지를 범례 컨테이너에 추가합니다.
+  		     	// 범례 이미지를 범례 컨테이너에 추가
   		     	legendContainer.appendChild(legendImg);
 	 		     	
 	 		     	
@@ -236,7 +214,7 @@ function hideLegend() {
   		        map.removeLayer(sdLayer1);	
   		        } 
   		    	
-  		        //시도 레이어 불러오기
+  		        // 시도 레이어 불러오기
   		   		sdLayer = new ol.layer.Tile({
   		   		name : 'selectedLayer',
   		   		visible: true,
@@ -261,7 +239,7 @@ function hideLegend() {
   		   		
   		   	var legendContainer = document.createElement('div');
 		     	legendContainer.setAttribute('id', 'legend-container');
-		     	// 맵 요소의 상대적인 위치에 범례 컨테이너를 추가합니다.
+		     	// 상대적인 위치에 범례 컨테이너를 추가
 		     	map.getTargetElement().appendChild(legendContainer);
 
 		     	// 범례 이미지 요청을 위한 URL 생성
@@ -274,11 +252,11 @@ function hideLegend() {
 		     	    '&WIDTH=80' +
 		     	    '&HEIGHT=20';
 
-		     	// 범례 이미지를 추가할 HTML <img> 엘리먼트를 생성합니다.
+		     	// 범례 이미지를 추가할 HTML <img> 엘리먼트를 생성
 		     	var legendImg = document.createElement('img');
 		     	legendImg.src = legendUrl;
 
-		     	// 범례 이미지를 범례 컨테이너에 추가합니다.
+		     	// 범례 이미지를 범례 컨테이너에 추가
 		     	legendContainer.appendChild(legendImg);
   		   		
   		   		
@@ -338,7 +316,7 @@ function hideLegend() {
   		   		
   		   	var legendContainer = document.createElement('div');
 		     	legendContainer.setAttribute('id', 'legend-container');
-		     	// 맵 요소의 상대적인 위치에 범례 컨테이너를 추가합니다.
+		     	// 맵 요소의 상대적인 위치에 범례 컨테이너를 추가
 		     	map.getTargetElement().appendChild(legendContainer);
 
 		     	// 범례 이미지 요청을 위한 URL 생성
@@ -351,11 +329,11 @@ function hideLegend() {
 		     	    '&WIDTH=80' +
 		     	    '&HEIGHT=20';
 
-		     	// 범례 이미지를 추가할 HTML <img> 엘리먼트를 생성합니다.
+		     	// 범례 이미지를 추가할 HTML <img> 엘리먼트를 생성
 		     	var legendImg = document.createElement('img');
 		     	legendImg.src = legendUrl;
 
-		     	// 범례 이미지를 범례 컨테이너에 추가합니다.
+		     	// 범례 이미지를 범례 컨테이너에 추가
 		     	legendContainer.appendChild(legendImg);
   		   		
   		  } else if (selectedLegend == "-범례선택-") {
@@ -402,7 +380,7 @@ function hideLegend() {
   		   		
 			var legendContainer = document.createElement('div');
 		     	legendContainer.setAttribute('id', 'legend-container');
-		     	// 맵 요소의 상대적인 위치에 범례 컨테이너를 추가합니다.
+		     	// 맵 요소의 상대적인 위치에 범례 컨테이너를 추가
 		     	map.getTargetElement().appendChild(legendContainer);
 
 		     	// 범례 이미지 요청을 위한 URL 생성
@@ -415,11 +393,11 @@ function hideLegend() {
 		     	    '&WIDTH=80' +
 		     	    '&HEIGHT=20';
 
-		     	// 범례 이미지를 추가할 HTML <img> 엘리먼트를 생성합니다.
+		     	// 범례 이미지를 추가할 HTML <img> 엘리먼트를 생성
 		     	var legendImg = document.createElement('img');
 		     	legendImg.src = legendUrl;
 
-		     	// 범례 이미지를 범례 컨테이너에 추가합니다.
+		     	// 범례 이미지를 범례 컨테이너에 추가
 		     	legendContainer.appendChild(legendImg);
 			  
 			   } else if (selectedSgg != "-시/군/구-" && selectedLegend == "등간격") {
@@ -459,7 +437,7 @@ function hideLegend() {
 	  			  
 	  			var legendContainer = document.createElement('div');
 		     	legendContainer.setAttribute('id', 'legend-container');
-		     	// 맵 요소의 상대적인 위치에 범례 컨테이너를 추가합니다.
+		     	// 맵 요소의 상대적인 위치에 범례 컨테이너를 추가
 		     	map.getTargetElement().appendChild(legendContainer);
 
 		     	// 범례 이미지 요청을 위한 URL 생성
@@ -472,11 +450,11 @@ function hideLegend() {
 		     	    '&WIDTH=80' +
 		     	    '&HEIGHT=20';
 
-		     	// 범례 이미지를 추가할 HTML <img> 엘리먼트를 생성합니다.
+		     	// 범례 이미지를 추가할 HTML <img> 엘리먼트를 생성
 		     	var legendImg = document.createElement('img');
 		     	legendImg.src = legendUrl;
 
-		     	// 범례 이미지를 범례 컨테이너에 추가합니다.
+		     	// 범례 이미지를 범례 컨테이너에 추가
 		     	legendContainer.appendChild(legendImg);
 	  			  
 			   }
